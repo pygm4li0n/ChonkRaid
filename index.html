@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🔮 CHONK RAIDS · Wizard Cat Edition</title>
 
-    <!-- ─── Preload both hero images so they arrive before the layout needs them ─── -->
+    <!-- ─── Preload hero images so they arrive before the layout needs them ─── -->
     <link rel="preload" as="image" href="https://i.postimg.cc/RCkvGRqY/Gato-mago-Chonk-Raid-(1).png" fetchpriority="high">
     <link rel="preload" as="image" href="https://i.postimg.cc/prJkhvT8/Gato-mago-Chonk-Raid-(2)-(2).png" fetchpriority="high">
+
+    <!-- ─── Preload card faces so the first flip never lags ─── -->
+    <link rel="preload" as="image" href="https://i.postimg.cc/rsWfNWpz/Trio-de-gatos-magos-magicos-(3).png" fetchpriority="high">
+    <link rel="preload" as="image" href="https://i.postimg.cc/rsWfNWpm/Trio-de-gatos-magos-magicos-(1).png" fetchpriority="high">
+    <link rel="preload" as="image" href="https://i.postimg.cc/C5DcsDKK/Trio-de-gatos-magos-magicos-(2).png" fetchpriority="high">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;600;700;900&family=Cinzel:wght@400;600;700;900&display=swap');
@@ -1116,6 +1121,19 @@
                 green: 'https://i.postimg.cc/rsWfNWpm/Trio-de-gatos-magos-magicos-(1).png',
                 red:   'https://i.postimg.cc/C5DcsDKK/Trio-de-gatos-magos-magicos-(2).png'
             };
+
+            // Warm the browser cache for card faces — decode in background during the intro
+            const _imageWarmup = [];
+            Object.values(IMAGES).forEach(src => {
+                const im = new Image();
+                im.fetchPriority = 'high';
+                im.decoding = 'async';
+                im.src = src;
+                // Kick off decode immediately so it's paint-ready by game start
+                if (im.decode) im.decode().catch(() => {});
+                _imageWarmup.push(im);
+            });
+
             const POINTS = { gold: 1250, green: 750, red: 450 };
             const TYPE_COLOR = { gold: 'gold', green: 'arcane', red: 'crimson' };
             const TOTAL_ROUNDS = 10;
